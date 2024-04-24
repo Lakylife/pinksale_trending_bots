@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trending Walletpayin</title>
+</head>
+<body>
+    <div style="width: 1024px; margin: auto; text-align: center;">
+        <label for="urlInput">Adresa:</label>
+        <input type="text" id="urlInput">
+        <button onclick="openInApp()">Spustit</button>
+        <br><br>
+        <label for="repeatCheckbox">Opakovat každých 5 sekund:</label>
+        <input type="checkbox" id="repeatCheckbox">
+        <br><br>
+        <div id="output"></div>
+    </div>
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        let cycleInterval;
+        let isRepeating = false;
+
+        function openInApp() {
+            const url = document.getElementById('urlInput').value;
+            const outputDiv = document.getElementById('output');
+
+            torRequest.request({
+                url: url,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36'
+                }
+            }, function (err, res, body) {
+                if (!err && res.statusCode == 200) {
+                    const iframe = document.createElement('iframe');
+                    iframe.srcdoc = body;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '800px';
+                    outputDiv.innerHTML = '';
+                    outputDiv.appendChild(iframe);
+                }
+            });
+        }
+
+        ipcRenderer.on('removeButton', () => {
+            const button = document.querySelector('button');
+            button.remove();
+        });
+
+        ipcRenderer.on('startCycle', () => {
+            const checkbox = document.getElementById('repeatCheckbox');
+            checkbox.checked = true;
+            isRepeating = true;
+            cycleInterval = setInterval(() => {
+                if (isRepeating) {
+                    openInApp();
+                }
+            }, 5000);
+        });
+
+        ipcRenderer.on('stopCycle', () => {
+            const checkbox = document.getElementById('repeatCheckbox');
+            checkbox.checked = false;
+            isRepeating = false;
+            clearInterval(cycleInterval);
+        });
+    </script>
+</body>
+</html>

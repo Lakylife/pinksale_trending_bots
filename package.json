@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "electron-proxy-agent": "^1.2.1",
+    "puppeteer": "^21.5.0",
+    "tor-request": "^3.1.0"
+  },
+  "devDependencies": {
+    "electron": "^27.0.3"
+  }
+}
